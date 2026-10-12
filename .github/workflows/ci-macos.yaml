@@ -1,12 +1,18 @@
-name: CI
+name: CI (macOS)
 
 on:
   push:
     branches: [main]
+    paths: [macos/**, .github/workflows/ci-macos.yaml]
   pull_request:
+    paths: [macos/**, .github/workflows/ci-macos.yaml]
 
 permissions:
   contents: read
+
+defaults:
+  run:
+    working-directory: macos
 
 jobs:
   build:

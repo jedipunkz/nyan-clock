@@ -1,0 +1,9 @@
+html, body { margin: 0; height: 100%; overflow: hidden; background: #003366; /* nyan.png background */ }
+body {
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+  user-select: none; cursor: default;
+  color: #fff; font: 600 13px "Segoe UI", sans-serif; font-variant-numeric: tabular-nums;
+}
+/* Let every click land on <body>, the drag region. */
+img, span { pointer-events: none; }
+img { height: 18px; }

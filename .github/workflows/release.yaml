@@ -11,14 +11,16 @@ on:
         options: [patch, minor, major]
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency: release
 
 jobs:
-  release:
+  version:
     if: github.ref == 'refs/heads/main'
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -41,17 +43,57 @@ jobs:
           echo "${latest:-none} -> $major.$minor.$patch"
           echo "version=$major.$minor.$patch" >> "$GITHUB_OUTPUT"
 
-      - name: Build
-        env:
-          VERSION: ${{ steps.version.outputs.version }}
-        run: |
-          ./build.sh
-          ditto -c -k --keepParent build/NyanClock.app "NyanClock-$VERSION.zip"
+  macos:
+    needs: version
+    runs-on: macos-latest
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: |
+          macos/build.sh
+          ditto -c -k --keepParent macos/build/NyanClock.app "NyanClock-$VERSION-macos.zip"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: macos
+          path: NyanClock-*-macos.zip
+          if-no-files-found: error
+
+  windows:
+    needs: version
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: |
+          # TAURI_CONFIG is merged into tauri.conf.json; stamps the exe's file version.
+          TAURI_CONFIG="{\"version\":\"$VERSION\"}" cargo build --release --locked --manifest-path windows/Cargo.toml
+          cp windows/target/release/NyanClock.exe "NyanClock-$VERSION-windows-x64.exe"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: windows
+          path: NyanClock-*-windows-x64.exe
+          if-no-files-found: error
+
+  release:
+    needs: [version, macos, windows]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          merge-multiple: true
 
       - name: Create release
         env:
           GH_TOKEN: ${{ github.token }}
-          VERSION: ${{ steps.version.outputs.version }}
+          GH_REPO: ${{ github.repository }}
+          VERSION: ${{ needs.version.outputs.version }}
         run: |
-          gh release create "v$VERSION" "NyanClock-$VERSION.zip" \
+          gh release create "v$VERSION" NyanClock-"$VERSION"-* \
             --target "$GITHUB_SHA" --title "v$VERSION" --generate-notes
