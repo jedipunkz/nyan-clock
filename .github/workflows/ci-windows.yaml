@@ -1,0 +1,24 @@
+name: CI (Windows)
+
+on:
+  push:
+    branches: [main]
+    paths: [windows/**, .github/workflows/ci-windows.yaml]
+  pull_request:
+    paths: [windows/**, .github/workflows/ci-windows.yaml]
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: windows
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: cargo fmt --check
+      - run: cargo clippy --release --locked -- -D warnings
+      - run: cargo build --release --locked

@@ -1,2 +1,4 @@
 build/
+target/
+windows/gen/
 .DS_Store
