@@ -11,7 +11,7 @@
       {
         "label": "main",
         "title": "Nyan Clock",
-        "width": 100,
+        "width": 210,
         "height": 24,
         "resizable": false,
         "maximizable": false,
