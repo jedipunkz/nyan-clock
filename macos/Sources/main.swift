@@ -13,10 +13,12 @@ final class ClockView: NSView {
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
     private let defaults = UserDefaults.standard
-    private let label = NSTextField(labelWithString: "00:00")
+    // Widest weekday, so sizeToFit leaves room for every day.
+    private let label = NSTextField(labelWithString: "0000/00/00(Wed) 00:00")
     private let formatter: DateFormatter = {
         let f = DateFormatter()
-        f.dateFormat = "HH:mm"
+        f.locale = Locale(identifier: "en_US_POSIX") // English weekday whatever the system language
+        f.dateFormat = "yyyy/MM/dd(EEE) HH:mm"
         return f
     }()
     private var window: NSWindow!

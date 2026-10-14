@@ -1,6 +1,6 @@
 # Nyan Clock
 
-A tiny desktop clock for macOS and Windows 11: Nyan Cat with a digital clock (`HH:mm`) next to it.
+A tiny desktop clock for macOS and Windows 11: Nyan Cat with the date and time (`YYYY/MM/DD(Mon) HH:mm`) next to it.
 
 - Drag anywhere on the clock to move it. The position is restored on next launch.
 - Right-click the clock (or click the menu bar / tray icon) for settings:
