@@ -10,7 +10,7 @@ A tiny desktop clock for macOS and Windows 11: Nyan Cat with the date and time (
 
 | Directory | Platform | Stack |
 |---|---|---|
-| [`macos/`](macos) | macOS 13 or later. Runs without a Dock icon. | Swift + AppKit |
+| [`macos/`](macos) | macOS 13 or later (Liquid Glass on macOS 26 or later). Runs without a Dock icon. | Swift + AppKit |
 | [`windows/`](windows) | Windows 11 (x64). Runs without a taskbar button. | Tauri 2 + Rust |
 
 ## Install
