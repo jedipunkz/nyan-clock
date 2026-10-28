@@ -38,18 +38,31 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
         label.frame.origin = NSPoint(x: imageView.frame.maxX + 4, y: (height - label.frame.height) / 2)
 
         let view = ClockView(frame: NSRect(x: 0, y: 0, width: label.frame.maxX + 8, height: height))
-        view.wantsLayer = true
-        view.layer?.backgroundColor = NSColor(red: 0, green: 0.2, blue: 0.4, alpha: 1).cgColor // nyan.png background
-        view.layer?.cornerRadius = 6
         view.addSubview(imageView)
         view.addSubview(label)
         view.menu = makeMenu()
+
+        let nyanBlue = NSColor(red: 0, green: 0.2, blue: 0.4, alpha: 1) // nyan.png background
+        let content: NSView
+        if #available(macOS 26, *) {
+            // Liquid Glass; the blue tint keeps the white text readable on light desktops.
+            let glass = NSGlassEffectView(frame: view.frame)
+            glass.cornerRadius = 6
+            glass.tintColor = nyanBlue.withAlphaComponent(0.5)
+            glass.contentView = view
+            content = glass
+        } else {
+            view.wantsLayer = true
+            view.layer?.backgroundColor = nyanBlue.cgColor
+            view.layer?.cornerRadius = 6
+            content = view
+        }
 
         window = NSWindow(contentRect: view.frame, styleMask: .borderless, backing: .buffered, defer: false)
         window.isOpaque = false
         window.backgroundColor = .clear
         window.hasShadow = true
-        window.contentView = view
+        window.contentView = content
         window.center()
         window.setFrameAutosaveName("NyanClockWindow") // restores and saves the position
         // Saved position may be on a monitor that is no longer connected.
